@@ -5,68 +5,101 @@ import ReactDOM from 'react-dom';
 // import App from './App';
 // import reportWebVitals from './reportWebVitals';
 
-const App = () => {
-  const [rates, setRates] = useState({
-    good: 0,
-    neutral: 0,
-    bad: 0
-  })
-
-  const setGoodRating = () => {
-    const newRate = {
-      good: rates.good + 1,
-      neutral: rates.neutral,
-      bad: rates.bad
-    }
-    setRates(newRate)
-  }
-
-  const setNeutralRating = () => {
-    const newRate = {
-      good: rates.good,
-      neutral: rates.neutral + 1,
-      bad: rates.bad
-    }
-    setRates(newRate)
-  }
-
-  const setBadRating = () => {
-    const newRate = {
-      good: rates.good,
-      neutral: rates.neutral,
-      bad: rates.bad + 1
-    }
-    setRates(newRate)
-  }
-  
+const Text = ({title}) => {
   return(
     <div>
-      <h1> Give Feedback </h1>
-      <button onClick={setGoodRating}>good</button>
-      <button onClick={setNeutralRating}>neutral</button>
-      <button onClick={setBadRating}>bad</button>
-
-      <h1>Statistics</h1>
-      <table>
-        <tbody>
-          <tr>
-            <td>Good</td>
-            <td>{rates.good}</td>
-          </tr>
-          <tr>
-            <td>Neutral</td>
-            <td>{rates.neutral}</td>
-          </tr>
-          <tr>
-            <td>Bad</td>
-            <td>{rates.bad}</td>
-          </tr>
-        </tbody>
-      </table>
-      
+      <h1>{title}</h1>
     </div>
   )
 }
+
+const Button = ({onClick, text}) => {
+  return(
+    <button onClick={onClick}>
+      {text}
+    </button>
+  )
+}
+
+const Statistic = ({text,value}) => {
+
+    if(text === "Positive")
+    {
+      return(
+        <tr>
+          <td>{text} </td> 
+          <td> {value}%</td>
+        </tr>
+      )
+    }
+    return(
+      <tr>
+        <td>{text} </td> 
+        <td> {value}</td>
+      </tr>
+    )
+}
+
+
+const Statistics = ({positive, negative, neutral, title}) =>{
+  const total = positive+negative+neutral
+
+  if (total === 0)
+  {
+    return(
+      <div>
+        <h1> {title} </h1>
+        No Feedback Given.
+      </div>
+    )
+  }
+
+  const goodScore = positive - negative
+  const average = goodScore/total
+  const positiveScore = (positive / total) * 100
+
+  return(
+    <div>
+      <Text title={title} />
+      <table>
+        <tbody>
+            <Statistic text="Good" value={positive} />
+            <Statistic text="Neutral" value={neutral} />
+            <Statistic text="Bad" value={negative} />
+            <Statistic text="All" value={total} />
+            <Statistic text="Average" value={average} />
+            <Statistic text="Positive" value={positiveScore} />
+        </tbody>
+      </table>
+    </div>
+  )
+
+
+  
+}
+
+const App = (props) => {
+  const title = "Give Feedback"
+  const stats = "Statistics"
+
+  const [good, setGoodRating] = useState(0)
+  const [bad, setBadRating] = useState(0)
+  const [neutral, setNeutralRating] = useState(0)
+
+  const countGood = (goodRate) => () => setGoodRating(goodRate)  
+  const countBad = (badRate) => () => setBadRating(badRate)
+  const countNeutral = (neutralRate) => () => setNeutralRating(neutralRate)
+
+  return(
+    <div>
+      <Text title={title} />
+      <Button onClick={countGood(good + 1)} text="Good" />
+      <Button onClick={countNeutral(neutral +1)} text="Neutral" />
+      <Button onClick={countBad(bad +1)} text="Bad" />
+      <Statistics title={stats} positive={good} negative={bad} neutral={neutral} />      
+    </div>
+  )
+  }
 
 
 
